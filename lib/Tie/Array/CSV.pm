@@ -221,7 +221,7 @@ This module was inspired by L<Tie::CSV_File> which (sadly) hasn't been maintaine
 
 As with any tied array, the construction uses the C<tie> function. 
 
- tie my @file, 'Tie::Array::CSV', 'filename'
+ tie my @file, 'Tie::Array::CSV', 'filename';
 
 would tie the lexically scoped array C<@file> to the file C<filename> using this module. Following these three arguements to C<tie>, one may optionally pass a hashref containing additional configuration. Currently the only options are "pass-through" options, sent to the constructors of the different modules used internally, read more about them in those module's documentation.
 
@@ -236,6 +236,13 @@ tie_file - hashref of options which are passed to the L<Tie::File> constructor
 text_csv - hashref of options which are passed to the L<Text::CSV> constructor
 
 =back
+
+example:
+
+ tie my @file, 'Tie::Array::CSV', 'filename', { 
+   tie_file => {}, 
+   text_csv => { sep_char => ';' },
+ };
 
 =head1 ERRORS
 
