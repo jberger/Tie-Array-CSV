@@ -185,11 +185,11 @@ L<Tie::File>
 
 =item *
 
-arbitrary line 
+arbitrary line access
 
 =item *
 
-access low memory use even for large files
+low memory use even for large files
 
 =back
 
