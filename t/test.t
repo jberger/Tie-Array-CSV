@@ -39,6 +39,9 @@ END_DATA
   is( pop @{ $csv[3] }, 1001, "Popped element gotten" );
   is( scalar @{ $csv[3] }, 1, "Popped element removed" );
 
+  push @{ $csv[3] }, 1002;
+  is( $csv[3][1], 1002, "Pushed element added" );
+
   pop @csv;
   is( scalar @csv, 3, "Pop outer array removes row" );
 
@@ -53,6 +56,8 @@ END_DATA
   $csv[1][2] .= '2';
   is( $csv[1][2], 42, "In place string join" );
 
+  push @csv, [ "tom christiansen", "major", 1101 ];
+
   ok( untie @csv, "Untie succeeds" );
 
   seek $fh, 0, 0;
@@ -60,6 +65,7 @@ END_DATA
 
   is_deeply( $parser->getline($fh), ["joel berger", "peon", 1010101 ], "File was updated 1" );
   is_deeply( $parser->getline($fh), ["larry wall", "general", 42 ], "File was updated 2" );
+  is_deeply( $parser->getline($fh), [ "tom christiansen", "major", 1101 ], "File was updated 3" );
   
 }
 
