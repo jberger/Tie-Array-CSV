@@ -250,7 +250,17 @@ For simplicity this module C<croak>s on all errors, which are trappable using a 
 
 =head1 CAVEATS
 
+=over 
+
+=item *
+
 Much of the functionality of normal arrays is mimicked using L<Tie::Array>. The interaction of this with L<Tie::File> should be mentioned in that certain actions may be very inefficient. For example, C<(un)shift>-ing the first row of data will probably involve L<Tie::Array> asking L<Tie::File> to move each row up one line, one-by-one. As a note, the intra-row C<(un)shift> does not suffer this problem.
+
+=item *
+
+No effort has yet been made to allow for fields which contain linebreaks. Linebreaks would change line numbers used for row access by L<Tie::File>. Patches welcome.
+
+=back
 
 =head1 SEE ALSO
 
