@@ -123,9 +123,13 @@ sub STORESIZE {
   my $self = shift;
   my $new_size = shift;
 
-  $#{ $self->{fields} } = $new_size - 1;
+  my $return = (
+    $#{ $self->{fields} } = $new_size - 1
+  );
 
   $self->_update;
+
+  return $return;
 }
 
 sub SHIFT {
