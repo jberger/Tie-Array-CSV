@@ -146,6 +146,7 @@ sub UNSHIFT {
 
   $self->_update;
 
+  return $self->FETCHSIZE();
 }
 
 sub _update {
