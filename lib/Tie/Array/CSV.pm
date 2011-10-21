@@ -11,6 +11,53 @@ use Text::CSV;
 use Tie::Array;
 our @ISA = ('Tie::Array');
 
+sub new {
+  my $class = shift;
+
+  croak "Must specify a file" unless @_;
+
+  my $file;
+  my %opts;
+
+  # handle one arg as either hashref (of opts) or file
+  if (@_ == 1) {
+    if (ref $_[0] eq 'HASH') {
+      %opts = %{ shift() };
+    } else {
+      $file = shift;
+    }
+  }
+
+  # handle file and hashref of opts
+  if (@_ == 2 and ref $_[1] eq 'HASH') {
+    $file = shift;
+    %opts = %{ shift() };
+  }
+
+  # handle file before hash of opts
+  if (@_ % 2) {
+    $file = shift;
+  }
+
+  # handle hash of opts
+  if (@_) {
+    %opts = @_;
+  }
+
+  # handle file passed has hash(ref) value to 'file' key
+  if (!$file and defined $opts{file}) {
+    $file = delete $opts{file};
+  }
+
+  # file wasn't specified as lone arg or as a hash opt
+  croak "Must specify a file" unless $file;
+
+  tie my @self, __PACKAGE__, $file, \%opts;
+
+  return \@self;
+
+}
+
 sub TIEARRAY {
   my $class = shift;
   my ($file, $opts) = @_;
