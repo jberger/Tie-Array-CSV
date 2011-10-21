@@ -285,6 +285,8 @@ Of course, the magical Perl C<tie> can be scary for some, for those people there
 
 =head2 C<new> Constructor
 
+[ Added in version 0.03 ]
+
 The class method C<new> constructor is more flexible in its calling. The constructor must be passed a file name, either as the first argument, or as the value to the option key C<file>. Options may be passed as key-value pairs or as a hash reference. This yields the many ways of calling C<new> shown below, one for every taste.
 
  my $array = Tie::Array::CSV->new( 'filename' );
