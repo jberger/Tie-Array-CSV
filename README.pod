@@ -97,7 +97,7 @@ Much of the functionality of normal arrays is mimicked using L<Tie::Array>. The 
 
 =item *
 
-No effort has yet been made to allow for fields which contain linebreaks. Linebreaks would change line numbers used for row access by L<Tie::File>. Patches welcome.
+Some effort had been made to allow for fields which contain linebreaks. Linebreaks would change line numbers used for row access by L<Tie::File>. This, unfortunately, moved the module far from its stated goals, and therefore far less powerful for its intended purposes. The decsion has been made (for now) not to support such files.
 
 =back
 
