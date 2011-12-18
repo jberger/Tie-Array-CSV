@@ -103,14 +103,10 @@ sub FETCH {
 
   my $line = $self->{file}[$index];
 
-  $self->{csv}->parse($line)
-    or croak "CSV parse error: " . $self->{csv}->error_diag();
-  my @fields = $self->{csv}->fields;
-
   tie my @line, 'Tie::Array::CSV::Row', { 
     file => $self->{file},
     line_num => $index,
-    fields => \@fields, 
+    fields => $self->_parse($line), 
     csv => $self->{csv},
     hold => $self->{hold_row},
   };
@@ -126,11 +122,7 @@ sub STORE {
   my $self = shift;
   my ($index, $value) = @_;
 
-  $self->{csv}->combine(
-    ref $value ? @$value : ($value)
-  ) 
-    or croak "CSV combine error: " . $self->{csv}->error_diag();
-  $self->{file}[$index] = $self->{csv}->string;
+  $self->{file}[$index] = $self->_combine($value);
 }
 
 sub SPLICE {
@@ -140,10 +132,7 @@ sub SPLICE {
   $offset += $size if $offset < 0;
   my $length = @_ ? shift : $size-$offset;
 
-  my @replace_rows = map {
-    $self->{csv}->combine( ref $_ ? @$_ : ($_) ) 
-      or croak "CSV combine error: " . $self->{csv}->error_diag();
-  } @_;
+  my @replace_rows = map { $self->_combine($_) } @_;
 
   ## reindex active_rows ##
 
@@ -175,10 +164,8 @@ sub SPLICE {
 
   ## end reindexing logic ##
 
-  my @return = map { 
-    $self->{csv}->parse($_) or croak "CSV parse error: " . $self->{csv}->error_diag();
-    [ $self->{csv}->fields ]
-  } splice(@{ $self->{file} },$offset,$length,@replace_rows);
+  my @return = map { $self->_parse($_) }
+    splice(@{ $self->{file} },$offset,$length,@replace_rows);
 
   return @return
 
@@ -202,6 +189,26 @@ sub STORESIZE {
 
   $#{ $self->{file} } = $new_size - 1;
   
+}
+
+sub _parse {
+  my $self = shift;
+  my ($line) = @_;
+
+  $self->{csv}->parse($line)
+    or croak "CSV parse error: " . $self->{csv}->error_diag();
+
+  return [$self->{csv}->fields];
+}
+
+sub _combine {
+  my $self = shift;
+  my ($value) = @_;
+
+  $self->{csv}->combine( ref $value ? @$value : ($value) )
+    or croak "CSV combine error: " . $self->{csv}->error_diag();
+
+  return $self->{csv}->string;
 }
 
 package Tie::Array::CSV::Row;
