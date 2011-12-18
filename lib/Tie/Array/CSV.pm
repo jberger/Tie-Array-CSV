@@ -122,6 +122,62 @@ sub FETCH {
   return \@line;
 }
 
+sub SHIFT {
+  my $self = shift;
+  my ($return) = $self->SPLICE(0,1);
+  return $return;
+}
+
+sub SPLICE {
+  my $self = shift;
+  my $size = $self->FETCHSIZE;
+  my $offset = @_ ? shift : 0;
+  $offset += $size if $offset < 0;
+  my $length = @_ ? shift : $size-$offset;
+
+  my @replace_rows = map {
+    $self->{csv}->combine( ref $_ ? @$_ : ($_) ) 
+      or croak "CSV combine error: " . $self->{csv}->error_diag();
+  } @_;
+
+  ## reindex active_rows ##
+
+  # assuming removing items
+  my @active_rows = sort { $a <=> $b } keys %{ $self->{active_rows} };
+  my $delta = -$length + @replace_rows;
+
+  # adding items
+  if ($length < @replace_rows) {
+    # reverse ot avoid overwriting active items
+    @active_rows = reverse @active_rows;
+    $delta = $length + @replace_rows;
+  }
+
+  foreach my $index (@active_rows) {
+    # skip undef'ed rows
+    next unless $self->{active_rows}{$index};
+    # skip lines before those affected
+    next if ($index < $offset);
+
+    if ($index >= $offset and $index < ($offset + $length)) { #items that are being removed
+      tied(@{$self->{active_rows}{$index}})->{line_num} = undef;
+    } else { #shifting affected items
+      tied(@{$self->{active_rows}{$index}})->{line_num} = $index+$delta;
+      $self->{active_rows}{$index+$delta} = delete $self->{active_rows}{$index}; 
+    }
+  }
+
+  ## end reindexing logic ##
+
+  my @return = map { 
+    $self->{csv}->parse($_) or croak "CSV parse error: " . $self->{csv}->error_diag();
+    [ $self->{csv}->fields ]
+  } splice(@{ $self->{file} },$offset,$length,@replace_rows);
+
+  return @return
+
+}
+
 sub STORE {
   my $self = shift;
   my ($index, $value) = @_;
@@ -243,6 +299,10 @@ sub UNSHIFT {
 
 sub _update {
   my $self = shift;
+  unless (defined $self->{line_num}) {
+    carp "Attempted to write out from a severed row";
+    return undef;
+  }
 
   $self->{csv}->combine(@{ $self->{fields} })
     or croak "CSV combine error: " . $self->{csv}->error_diag();
