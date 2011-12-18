@@ -82,6 +82,7 @@ sub TIEARRAY {
   my $self = {
     file => \@tiefile,
     csv => $csv,
+    hold_row => (defined $opts->{hold_row} ? $opts->{hold_row} : 1),
   };
 
   bless $self, $class;
@@ -104,6 +105,7 @@ sub FETCH {
     line_num => $index,
     fields => \@fields, 
     csv => $self->{csv},
+    hold => $self->{hold_row},
   };
 
   return \@line;
@@ -168,8 +170,11 @@ sub STORE {
 
   $self->{fields}[$index] = $value;
 
-  #$self->_update;
-  $self->{need_update} = 1;
+  if ($self->{hold}) {
+    $self->{need_update} = 1;
+  } else {
+    $self->_update;
+  }
 
 }
 
@@ -187,8 +192,11 @@ sub STORESIZE {
     $#{ $self->{fields} } = $new_size - 1
   );
 
-  #$self->_update;
-  $self->{need_update} = 1;
+  if ($self->{hold}) {
+    $self->{need_update} = 1;
+  } else {
+    $self->_update;
+  }
 
   return $return;
 }
@@ -198,8 +206,11 @@ sub SHIFT {
 
   my $value = shift @{ $self->{fields} };
 
-  #$self->_update;
-  $self->{need_update} = 1;
+  if ($self->{hold}) {
+    $self->{need_update} = 1;
+  } else {
+    $self->_update;
+  }
 
   return $value;
 }
@@ -210,8 +221,11 @@ sub UNSHIFT {
 
   unshift @{ $self->{fields} }, $value;
 
-  #$self->_update;
-  $self->{need_update} = 1;
+  if ($self->{hold}) {
+    $self->{need_update} = 1;
+  } else {
+    $self->_update;
+  }
 
   return $self->FETCHSIZE();
 }
@@ -290,6 +304,8 @@ uses the speedy L<Text::CSV_XS> if installed
 
 This module was inspired by L<Tie::CSV_File> which (sadly) hasn't been maintained. It also doesn't attempt to do any of the parsing (as that module did), but rather passes all of the heavy lifting to other modules.
 
+Note that while the L<Tie::File> prevents the need to read in the entire file, while in use, a parsed row IS held in memory. This is true whether <hold_row> is in effect or not (see L<Options> below).
+
 =head1 CONSTRUCTORS
 
 Since version 0.04 both constructors allow the options that version 0.03 only offered for the C<new> constructor. The constructors must be passed a file name, either as the first argument, or as the value to the option key C<file>. Options may be passed as key-value pairs or as a hash reference. This yields the many ways of calling the constructors shown below, one for every taste.
@@ -325,36 +341,39 @@ It only returns a reference to the C<tie>d array due to a limitations in how C<t
 
 =head2 Options
 
-Currently the only options are "pass-through" options, sent to the constructors of the different modules used internally, read more about them in those module's documentation.
-
 =over
 
 =item *
 
-file - alternative method for specifing the file to C<tie>. This is overridden by a lone filename or handle passed as the first argument to the constructor.
+C<file> - alternative method for specifing the file to C<tie>. This is overridden by a lone filename or handle passed as the first argument to the constructor.
 
 =item *
 
-tie_file - hashref of options which are passed to the L<Tie::File> constructor
+C<tie_file> - hashref of options which are passed to the L<Tie::File> constructor
 
 =item *
 
-text_csv - hashref of options which are passed to the L<Text::CSV> constructor
+C<text_csv> - hashref of options which are passed to the L<Text::CSV> constructor
 
 =item *
 
-sep_char - for ease of use, a C<sep_char> option may be specified, which is passed to the L<Text::CSV> constructor,
+C<sep_char> - for ease of use, a C<sep_char> option may be specified, which is passed to the L<Text::CSV> constructor. This option overrides a corresponding entry in the C<text_csv> pass-through hash.
+
+=item *
+
+C<hold_row> - If true, the file is not updated while the reference to the row is still in scope. The default is true. Note: that when false, the parsed row is still held in memory while the row is in scope, the ONLY difference is that the file reflects changes immediately when C<hold_row> is false. To reiterate, this option only affects file IO, not memory usage.
 
 =back
 
-examples:
+Equivalent examples:
 
  tie my @file, 'Tie::Array::CSV', 'filename', { 
    tie_file => {}, 
    text_csv => { sep_char => ';' },
+   hold_row => 0
  };
 
- tie my @file, 'Tie::Array::CSV', 'filename', sep_char => ';';
+ tie my @file, 'Tie::Array::CSV', 'filename', sep_char => ';', hold_row => 0;
 
 =head1 ERRORS
 
