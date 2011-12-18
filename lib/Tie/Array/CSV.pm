@@ -292,23 +292,28 @@ This module was inspired by L<Tie::CSV_File> which (sadly) hasn't been maintaine
 
 =head1 CONSTRUCTORS
 
+Since version 0.04 both constructors allow the options that version 0.03 only offered for the C<new> constructor. The constructors must be passed a file name, either as the first argument, or as the value to the option key C<file>. Options may be passed as key-value pairs or as a hash reference. This yields the many ways of calling the constructors shown below, one for every taste.
+
+N.B. Should a lone argument filename and a C<file> option key both be passed to the constructor, the lone argument wins.
+
 =head2 C<tie> Constructor
 
-As with any tied array, the construction uses the C<tie> function. 
+As with any tied array, the construction uses the C<tie> function. Basic usage is as follows:
 
  tie my @file, 'Tie::Array::CSV', 'filename';
 
-would tie the lexically scoped array C<@file> to the file C<filename> using this module. Following these three arguements to C<tie>, one may optionally pass a hashref containing additional configuration.
+which would tie the lexically scoped array C<@file> to the file C<filename> using this module. Following the first two arguements to C<tie>, one may optionally pass a key-value pairs or a hashref containing additional configuration or even file specification.
 
  tie my @file, 'Tie::Array::CSV', 'filename', { opt_key => val, ... };
+ tie my @file, 'Tie::Array::CSV', 'filename', opt_key => val, ... ;
+ tie my @file, 'Tie::Array::CSV', { file => 'filename', opt_key => val, ... };
+ tie my @file, 'Tie::Array::CSV', file => 'filename', opt_key => val, ... ;
 
 Of course, the magical Perl C<tie> can be scary for some, for those people there is the ...
 
 =head2 C<new> Constructor
 
 [ Added in version 0.03 ]
-
-The class method C<new> constructor is more flexible in its calling. The constructor must be passed a file name, either as the first argument, or as the value to the option key C<file>. Options may be passed as key-value pairs or as a hash reference. This yields the many ways of calling C<new> shown below, one for every taste.
 
  my $array = Tie::Array::CSV->new( 'filename' );
  my $array = Tie::Array::CSV->new( 'filename', { opt_key => val, ... });
@@ -318,13 +323,15 @@ The class method C<new> constructor is more flexible in its calling. The constru
 
 It only returns a reference to the C<tie>d array due to a limitations in how C<tie> magic works. 
 
-N.B. Should a lone argument filename and a C<file> option key both be passed to the constructor, the lone argument wins.
-
 =head2 Options
 
 Currently the only options are "pass-through" options, sent to the constructors of the different modules used internally, read more about them in those module's documentation.
 
 =over
+
+=item *
+
+file - alternative method for specifing the file to C<tie>. This is overridden by a lone filename or handle passed as the first argument to the constructor.
 
 =item *
 
@@ -334,14 +341,20 @@ tie_file - hashref of options which are passed to the L<Tie::File> constructor
 
 text_csv - hashref of options which are passed to the L<Text::CSV> constructor
 
+=item *
+
+sep_char - for ease of use, a C<sep_char> option may be specified, which is passed to the L<Text::CSV> constructor,
+
 =back
 
-example:
+examples:
 
  tie my @file, 'Tie::Array::CSV', 'filename', { 
    tie_file => {}, 
    text_csv => { sep_char => ';' },
  };
+
+ tie my @file, 'Tie::Array::CSV', 'filename', sep_char => ';';
 
 =head1 ERRORS
 
@@ -357,7 +370,7 @@ Much of the functionality of normal arrays is mimicked using L<Tie::Array>. The 
 
 =item *
 
-Some effort had been made to allow for fields which contain linebreaks. Linebreaks would change line numbers used for row access by L<Tie::File>. This, unfortunately, moved the module far from its stated goals, and therefore far less powerful for its intended purposes. The decsion has been made (for now) not to support such files.
+Some effort had been made to allow for fields which contain linebreaks. Linebreaks would change line numbers used for row access by L<Tie::File>. This, unfortunately, moved the module far from its stated goals, and therefore far less powerful for its intended purposes. The decision has been made (for now) not to support such files.
 
 =back
 
