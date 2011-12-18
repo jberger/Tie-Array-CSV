@@ -11,13 +11,11 @@ use Text::CSV;
 use Tie::Array;
 our @ISA = ('Tie::Array');
 
-sub new {
-  my $class = shift;
+sub parse_opts {
 
   croak "Must specify a file" unless @_;
 
-  my $file;
-  my %opts;
+  my ($file, %opts);
 
   # handle one arg as either hashref (of opts) or file
   if (@_ == 1) {
@@ -52,7 +50,19 @@ sub new {
   # file wasn't specified as lone arg or as a hash opt
   croak "Must specify a file" unless $file;
 
-  tie my @self, __PACKAGE__, $file, \%opts;
+  # parse specific options
+  if (exists $opts{sep_char}) {
+    $opts{text_csv}{sep_char} = delete $opts{sep_char};
+  }
+
+  return ($file, \%opts);
+}
+
+sub new {
+  my $class = shift;
+  my ($file, $opts) = parse_opts(@_);
+
+  tie my @self, __PACKAGE__, $file, $opts;
 
   return \@self;
 
@@ -60,7 +70,7 @@ sub new {
 
 sub TIEARRAY {
   my $class = shift;
-  my ($file, $opts) = @_;
+  my ($file, $opts) = parse_opts(@_);
 
   my @tiefile;
   tie @tiefile, 'Tie::File', $file, %{ $opts->{tie_file} || {} }
