@@ -8,6 +8,8 @@ use Carp;
 use Tie::File;
 use Text::CSV;
 
+use Scalar::Util qw/weaken/;
+
 use Tie::Array;
 our @ISA = ('Tie::Array');
 
@@ -83,6 +85,7 @@ sub TIEARRAY {
     file => \@tiefile,
     csv => $csv,
     hold_row => (defined $opts->{hold_row} ? $opts->{hold_row} : 1),
+    active_rows => {},
   };
 
   bless $self, $class;
@@ -93,6 +96,10 @@ sub TIEARRAY {
 sub FETCH {
   my $self = shift;
   my $index = shift;
+
+  if ($self->{active_rows}{$index}) {
+    return $self->{active_rows}{$index}
+  }
 
   my $line = $self->{file}[$index];
 
@@ -107,6 +114,10 @@ sub FETCH {
     csv => $self->{csv},
     hold => $self->{hold_row},
   };
+
+  weaken(
+    $self->{active_rows}{$index} = \@line
+  );
 
   return \@line;
 }
