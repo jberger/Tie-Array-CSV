@@ -304,7 +304,7 @@ uses the speedy L<Text::CSV_XS> if installed
 
 This module was inspired by L<Tie::CSV_File> which (sadly) hasn't been maintained. It also doesn't attempt to do any of the parsing (as that module did), but rather passes all of the heavy lifting to other modules.
 
-Note that while the L<Tie::File> prevents the need to read in the entire file, while in use, a parsed row IS held in memory. This is true whether <hold_row> is in effect or not (see L<Options> below).
+Note that while the L<Tie::File> prevents the need to read in the entire file, while in use, a parsed row IS held in memory. This is true whether C<hold_row> is in effect or not (see L<Options> below).
 
 =head1 CONSTRUCTORS
 
