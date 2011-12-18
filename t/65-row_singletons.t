@@ -55,7 +55,7 @@ END_DATA
     is( tied(@$row_2)->{line_num}, 1, "after splicing affected row knows new line number" );
     is( ref $spliced, 'ARRAY', "splice returns an arrayref" ); 
     is( scalar @$spliced, 3, "spliced arrayref is of correct length" );
-    ok( ! defined tied(@$old_row_1)->{line_num}, "spliced rows remove their line number" );
+    ok( ! defined tied(@$old_row_1)->{line_num}, "spliced rows have line numbers removed, severing them" );
 
     my $row_1 = $csv[1];
     is( $row_2 . "", $row_1 . "", "after splicing still get correct singleton");

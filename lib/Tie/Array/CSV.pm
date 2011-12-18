@@ -122,10 +122,15 @@ sub FETCH {
   return \@line;
 }
 
-sub SHIFT {
+sub STORE {
   my $self = shift;
-  my ($return) = $self->SPLICE(0,1);
-  return $return;
+  my ($index, $value) = @_;
+
+  $self->{csv}->combine(
+    ref $value ? @$value : ($value)
+  ) 
+    or croak "CSV combine error: " . $self->{csv}->error_diag();
+  $self->{file}[$index] = $self->{csv}->string;
 }
 
 sub SPLICE {
@@ -143,19 +148,20 @@ sub SPLICE {
   ## reindex active_rows ##
 
   # assuming removing items
-  my @active_rows = sort { $a <=> $b } keys %{ $self->{active_rows} };
-  my $delta = -$length + @replace_rows;
+  my @active_rows = 
+    sort { $a <=> $b } 
+    grep { defined $self->{active_rows}{$_} }
+    keys %{ $self->{active_rows} };
+  my $delta = @replace_rows - $length;
 
-  # adding items
+  # if instead adding items
   if ($length < @replace_rows) {
     # reverse ot avoid overwriting active items
     @active_rows = reverse @active_rows;
-    $delta = $length + @replace_rows;
+    $delta = @replace_rows + $length;
   }
 
   foreach my $index (@active_rows) {
-    # skip undef'ed rows
-    next unless $self->{active_rows}{$index};
     # skip lines before those affected
     next if ($index < $offset);
 
@@ -178,15 +184,10 @@ sub SPLICE {
 
 }
 
-sub STORE {
+sub SHIFT {
   my $self = shift;
-  my ($index, $value) = @_;
-
-  $self->{csv}->combine(
-    ref $value ? @$value : ($value)
-  ) 
-    or croak "CSV combine error: " . $self->{csv}->error_diag();
-  $self->{file}[$index] = $self->{csv}->string;
+  my ($return) = $self->SPLICE(0,1);
+  return $return;
 }
 
 sub FETCHSIZE {
@@ -433,6 +434,8 @@ C<sep_char> - for ease of use, a C<sep_char> option may be specified, which is p
 =item *
 
 C<hold_row> - If true, the file is not updated while the reference to the row is still in scope. The default is true. Note: that when false, the parsed row is still held in memory while the row is in scope, the ONLY difference is that the file reflects changes immediately when C<hold_row> is false. To reiterate, this option only affects file IO, not memory usage.
+
+To combat the possibility that conflicting directives could be passed when multiple rows are kept alive, as of version 0.05, the all child row objects are made aware of line number changes should they occur. Futher if a row object is kept alive, but the parent object removes that line, the row object is remains, but the link is severed.
 
 =back
 
