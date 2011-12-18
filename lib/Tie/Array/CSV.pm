@@ -140,6 +140,8 @@ sub TIEARRAY {
 
   bless $self, $class;
 
+  $self->{need_update} = 0;
+
   return $self;
 }
 
@@ -156,7 +158,8 @@ sub STORE {
 
   $self->{fields}[$index] = $value;
 
-  $self->_update;
+  #$self->_update;
+  $self->{need_update} = 1;
 
 }
 
@@ -174,7 +177,8 @@ sub STORESIZE {
     $#{ $self->{fields} } = $new_size - 1
   );
 
-  $self->_update;
+  #$self->_update;
+  $self->{need_update} = 1;
 
   return $return;
 }
@@ -184,7 +188,8 @@ sub SHIFT {
 
   my $value = shift @{ $self->{fields} };
 
-  $self->_update;
+  #$self->_update;
+  $self->{need_update} = 1;
 
   return $value;
 }
@@ -195,7 +200,8 @@ sub UNSHIFT {
 
   unshift @{ $self->{fields} }, $value;
 
-  $self->_update;
+  #$self->_update;
+  $self->{need_update} = 1;
 
   return $self->FETCHSIZE();
 }
@@ -206,6 +212,11 @@ sub _update {
   $self->{csv}->combine(@{ $self->{fields} })
     or croak "CSV combine error: " . $self->{csv}->error_diag();
   $self->{file}[$self->{line_num}] = $self->{csv}->string;
+}
+
+sub DESTROY {
+  my $self = shift;
+  $self->_update if $self->{need_update} == 1;
 }
 
 __END__
