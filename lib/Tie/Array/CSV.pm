@@ -10,9 +10,6 @@ use Text::CSV;
 
 use Scalar::Util qw/weaken/;
 
-use Tie::Array;
-our @ISA = ('Tie::Array');
-
 sub parse_opts {
 
   croak "Must specify a file" unless @_;
@@ -177,19 +174,52 @@ sub SHIFT {
   return $return;
 }
 
+sub UNSHIFT { scalar shift->SPLICE(0,0,@_) }
+
+sub PUSH {
+  my $self = shift;
+  my $i = $self->FETCHSIZE;
+  $self->STORE($i++, shift) while (@_);
+}
+
+sub POP {
+  my $self = shift;
+  my $newsize = $self->FETCHSIZE - 1;
+  my $val;
+  if ($newsize >= 0) {
+    $val = $self->FETCH($newsize);
+    $self->STORESIZE($newsize);
+  }
+  return $val;
+}
+
 sub FETCHSIZE {
   my $self = shift;
-
   return scalar @{ $self->{file} };
 }
 
 sub STORESIZE {
   my $self = shift;
   my $new_size = shift;
-
   $#{ $self->{file} } = $new_size - 1;
-  
 }
+
+sub CLEAR { shift->STORESIZE(0) }
+
+sub EXISTS { 
+  my $self = shift;
+  my ($index) = shift;
+  return exists $self->{file}[$index];
+}
+
+sub DELETE { 
+  my $self = shift;
+  my $index = shift;
+  my ($return) = $self->SPLICE($index,1);
+  return $return;
+}
+
+sub EXTEND  { }
 
 sub _parse {
   my $self = shift;

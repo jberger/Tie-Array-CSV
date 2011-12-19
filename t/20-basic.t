@@ -45,7 +45,12 @@ END_DATA
   pop @csv;
   is( scalar @csv, 3, "Pop outer array removes row" );
 
-  is_deeply( shift @csv, ["name", "rank", "serial number"], "Shifted outer array row gotten" );
+  my $header = ["name", "rank", "serial number"];
+  is_deeply( shift @csv, $header, "Shifted outer array row gotten" );
+
+  push @csv, $header;
+  is_deeply( delete $csv[-1], $header, "Delete on outer array, row gotten" );
+
   is( $csv[0][0], "joel berger", "Shift outer array removed row" );
 
   $csv[1][2] += 2;
@@ -55,6 +60,9 @@ END_DATA
 
   $csv[1][2] .= '2';
   is( $csv[1][2], 42, "In place string join" );
+
+  ok( exists $csv[0], "First element exists" );
+  ok( ! exists $csv[1000], "1000th element doesn't exist" );
 
   push @csv, [ "tom christiansen", "major", 1101 ];
 
@@ -70,3 +78,4 @@ END_DATA
 }
 
 done_testing();
+
