@@ -472,7 +472,7 @@ C<sep_char> - for ease of use, a C<sep_char> option may be specified, which is p
 
 C<hold_row> - If true, the file is not updated while the reference to the row is still in scope. The default is true. Note: that when false, the parsed row is still held in memory while the row is in scope, the ONLY difference is that the file reflects changes immediately when C<hold_row> is false. To reiterate, this option only affects file IO, not memory usage.
 
-To combat the possibility that conflicting directives could be passed when multiple rows are kept alive, as of version 0.05, the all child row objects are made aware of line number changes should they occur. Futher if a row object is kept alive, but the parent object removes that line, the row object is remains, but the link is severed.
+When multiple rows are kept alive/removed/modified there was the possibility that conflicting directives could be given to a single physical line. To combat this possibility, as of version 0.05, all (living) child row objects are made aware of line number changes in the parent (outer array) should these occur. Futher if a row object is alive, but the parent object removes that line, the row object is remains intact, but the links between the row object and parent/file are severed.
 
 =back
 
@@ -488,7 +488,7 @@ Equivalent examples:
 
 =head1 ERRORS
 
-For simplicity this module C<croak>s on all errors, which are trappable using a C<$SIG{__DIE__}> handler.
+For simplicity this module C<croak>s on all almost all errors, which are trappable using a C<$SIG{__DIE__}> handler. Modifing a severed row object issues a warning.
 
 =head1 CAVEATS
 
