@@ -1,4 +1,4 @@
-package Tie::Array::CSV;
+package Tie::Array::CSV::HoldRow;
 
 use strict;
 use warnings;
@@ -100,7 +100,7 @@ sub FETCH {
 
   my $line = $self->{file}[$index];
 
-  tie my @line, 'Tie::Array::CSV::Row', { 
+  tie my @line, 'Tie::Array::CSV::HoldRow::Row', { 
     file => $self->{file},
     line_num => $index,
     fields => $self->_parse($line), 
@@ -241,7 +241,7 @@ sub _combine {
   return $self->{csv}->string;
 }
 
-package Tie::Array::CSV::Row;
+package Tie::Array::CSV::HoldRow::Row;
 
 use Carp;
 
@@ -357,13 +357,13 @@ __POD__
 
 =head1 NAME
 
-Tie::Array::CSV - A tied array which combines the power of Tie::File and Text::CSV
+Tie::Array::CSV::HoldRow - A tied array which combines the power of Tie::File and Text::CSV
 
 =head1 SYNOPSIS
 
  use strict; use warnings;
- use Tie::Array::CSV;
- tie my @file, 'Tie::Array::CSV', 'filename';
+ use Tie::Array::CSV::HoldRow;
+ tie my @file, 'Tie::Array::CSV::HoldRow', 'filename';
 
  print $file[0][2];
  $file[3][5] = "Camel";
@@ -425,14 +425,14 @@ N.B. Should a lone argument filename and a C<file> option key both be passed to 
 
 As with any tied array, the construction uses the C<tie> function. Basic usage is as follows:
 
- tie my @file, 'Tie::Array::CSV', 'filename';
+ tie my @file, 'Tie::Array::CSV::HoldRow', 'filename';
 
 which would tie the lexically scoped array C<@file> to the file C<filename> using this module. Following the first two arguements to C<tie>, one may optionally pass a key-value pairs or a hashref containing additional configuration or even file specification.
 
- tie my @file, 'Tie::Array::CSV', 'filename', { opt_key => val, ... };
- tie my @file, 'Tie::Array::CSV', 'filename', opt_key => val, ... ;
- tie my @file, 'Tie::Array::CSV', { file => 'filename', opt_key => val, ... };
- tie my @file, 'Tie::Array::CSV', file => 'filename', opt_key => val, ... ;
+ tie my @file, 'Tie::Array::CSV::HoldRow', 'filename', { opt_key => val, ... };
+ tie my @file, 'Tie::Array::CSV::HoldRow', 'filename', opt_key => val, ... ;
+ tie my @file, 'Tie::Array::CSV::HoldRow', { file => 'filename', opt_key => val, ... };
+ tie my @file, 'Tie::Array::CSV::HoldRow', file => 'filename', opt_key => val, ... ;
 
 Of course, the magical Perl C<tie> can be scary for some, for those people there is the ...
 
@@ -440,11 +440,11 @@ Of course, the magical Perl C<tie> can be scary for some, for those people there
 
 [ Added in version 0.03 ]
 
- my $array = Tie::Array::CSV->new( 'filename' );
- my $array = Tie::Array::CSV->new( 'filename', { opt_key => val, ... });
- my $array = Tie::Array::CSV->new( 'filename', opt_key => val, ... );
- my $array = Tie::Array::CSV->new( file => 'filename', opt_key => val, ... );
- my $array = Tie::Array::CSV->new( { file => 'filename', opt_key => val, ... } );
+ my $array = Tie::Array::CSV::HoldRow->new( 'filename' );
+ my $array = Tie::Array::CSV::HoldRow->new( 'filename', { opt_key => val, ... });
+ my $array = Tie::Array::CSV::HoldRow->new( 'filename', opt_key => val, ... );
+ my $array = Tie::Array::CSV::HoldRow->new( file => 'filename', opt_key => val, ... );
+ my $array = Tie::Array::CSV::HoldRow->new( { file => 'filename', opt_key => val, ... } );
 
 It only returns a reference to the C<tie>d array due to a limitations in how C<tie> magic works. 
 
@@ -478,13 +478,13 @@ When multiple rows are kept alive/removed/modified there was the possibility tha
 
 Equivalent examples:
 
- tie my @file, 'Tie::Array::CSV', 'filename', { 
+ tie my @file, 'Tie::Array::CSV::HoldRow', 'filename', { 
    tie_file => {}, 
    text_csv => { sep_char => ';' },
    hold_row => 0
  };
 
- tie my @file, 'Tie::Array::CSV', 'filename', sep_char => ';', hold_row => 0;
+ tie my @file, 'Tie::Array::CSV::HoldRow', 'filename', sep_char => ';', hold_row => 0;
 
 =head1 ERRORS
 
