@@ -139,17 +139,6 @@ sub POP {
   return $val;
 }
 
-sub FETCHSIZE {
-  my $self = shift;
-  return scalar @{ $self->{file} };
-}
-
-sub STORESIZE {
-  my $self = shift;
-  my $new_size = shift;
-  $#{ $self->{file} } = $new_size - 1;
-}
-
 sub CLEAR { shift->STORESIZE(0) }
 
 sub EXISTS { 
@@ -166,26 +155,6 @@ sub DELETE {
 }
 
 sub EXTEND  { }
-
-sub _parse {
-  my $self = shift;
-  my ($line) = @_;
-
-  $self->{csv}->parse($line)
-    or croak "CSV parse error: " . $self->{csv}->error_diag();
-
-  return [$self->{csv}->fields];
-}
-
-sub _combine {
-  my $self = shift;
-  my ($value) = @_;
-
-  $self->{csv}->combine( ref $value ? @$value : ($value) )
-    or croak "CSV combine error: " . $self->{csv}->error_diag();
-
-  return $self->{csv}->string;
-}
 
 package Tie::Array::CSV::HoldRow::Row;
 
