@@ -164,7 +164,7 @@ use Tie::Array;
 our @ISA = ('Tie::Array');
 
 use overload 
-  '@{}' => sub{ return @{ $_[0]{fields} } };
+  '@{}' => sub{ $_[0]{fields} };
 
 sub TIEARRAY {
   my $class = shift;
