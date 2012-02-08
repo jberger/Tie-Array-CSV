@@ -8,7 +8,7 @@ use File::Temp qw/tempfile/;
 use Text::CSV;
 my $parser = Text::CSV->new();
 
-use_ok( 'Tie::Array::CSV' );
+use_ok( 'Tie::Array::CSV::HoldRow' );
 
 my $test_data = <<END_DATA;
 name,rank,serial number
@@ -22,7 +22,7 @@ END_DATA
   print $fh $test_data;
 
   my @csv;
-  ok( tie(@csv, 'Tie::Array::CSV', $fh), "Tied CSV" );
+  ok( tie(@csv, 'Tie::Array::CSV::HoldRow', $fh), "Tied CSV" );
 
   {
     my $row = $csv[0];

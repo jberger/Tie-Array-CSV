@@ -29,7 +29,6 @@ sub TIEARRAY {
   my $self = {
     file => \@tiefile,
     csv => $csv,
-    hold_row => (defined $opts->{hold_row} ? $opts->{hold_row} : 1),
     active_rows => {},
   };
 
@@ -53,7 +52,6 @@ sub FETCH {
     line_num => $index,
     fields => $self->_parse($line), 
     csv => $self->{csv},
-    hold => $self->{hold_row},
   };
 
   weaken(
@@ -223,12 +221,7 @@ sub STORE {
 
   $self->{fields}[$index] = $value;
 
-  if ($self->{hold}) {
-    $self->{need_update} = 1;
-  } else {
-    $self->_update;
-  }
-
+  $self->{need_update} = 1;
 }
 
 sub FETCHSIZE {
@@ -245,11 +238,7 @@ sub STORESIZE {
     $#{ $self->{fields} } = $new_size - 1
   );
 
-  if ($self->{hold}) {
-    $self->{need_update} = 1;
-  } else {
-    $self->_update;
-  }
+  $self->{need_update} = 1;
 
   return $return;
 }
@@ -259,11 +248,7 @@ sub SHIFT {
 
   my $value = shift @{ $self->{fields} };
 
-  if ($self->{hold}) {
-    $self->{need_update} = 1;
-  } else {
-    $self->_update;
-  }
+  $self->{need_update} = 1;
 
   return $value;
 }
@@ -274,11 +259,7 @@ sub UNSHIFT {
 
   unshift @{ $self->{fields} }, $value;
 
-  if ($self->{hold}) {
-    $self->{need_update} = 1;
-  } else {
-    $self->_update;
-  }
+  $self->{need_update} = 1;
 
   return $self->FETCHSIZE();
 }
