@@ -97,7 +97,8 @@ sub FETCH {
 
   my $line = $self->{file}[$index];
 
-  tie my @line, 'Tie::Array::CSV::Row', { 
+  my $rowclass = ref($self) . '::Row';
+  tie my @line, $rowclass, { 
     file => $self->{file},
     line_num => $index,
     fields => $self->_parse($line), 

@@ -36,20 +36,13 @@ sub FETCH {
     return $self->{active_rows}{$index}
   }
 
-  my $line = $self->{file}[$index];
-
-  tie my @line, 'Tie::Array::CSV::HoldRow::Row', { 
-    file => $self->{file},
-    line_num => $index,
-    fields => $self->_parse($line), 
-    csv => $self->{csv},
-  };
+  my $line_array = $self->SUPER::FETCH($index);
 
   weaken(
-    $self->{active_rows}{$index} = \@line
+    $self->{active_rows}{$index} = $line_array
   );
 
-  return \@line;
+  return $line_array;
 }
 
 sub STORE {
