@@ -8,6 +8,8 @@ use Carp;
 use Tie::File;
 use Text::CSV;
 
+use Scalar::Util qw/blessed/;
+
 use Tie::Array;
 our @ISA = ('Tie::Array');
 
@@ -78,8 +80,13 @@ sub TIEARRAY {
   tie @tiefile, 'Tie::File', $file, %{ $opts->{tie_file} || {} }
     or croak "Cannot tie file $file";
 
-  my $csv = Text::CSV->new($opts->{text_csv} || {}) 
-    or croak "CSV (new) error: " . Text::CSV->error_diag();
+  my $csv;
+  if (blessed $opts->{text_csv} and $opts->{text_csv}->isa('Text::CSV')) {
+    $csv = $opts->{text_csv};
+  } else {
+    $csv = Text::CSV->new($opts->{text_csv} || {}) 
+      or croak "CSV (new) error: " . Text::CSV->error_diag();
+  }
 
   my $self = {
     file => \@tiefile,
@@ -372,7 +379,19 @@ C<tie_file> - hashref of options which are passed to the L<Tie::File> constructo
 
 =item *
 
-C<text_csv> - hashref of options which are passed to the L<Text::CSV> constructor
+C<text_csv> - either:
+
+=over
+
+=item *
+
+hashref of options which are passed to the L<Text::CSV> constructor
+
+=item * 
+
+an object which satisfies C<< isa('Text::CSV') >> (added in version 0.05)
+
+=back
 
 =item *
 
@@ -389,7 +408,7 @@ Equivalent examples:
 
  tie my @file, 'Tie::Array::CSV', 'filename', sep_char => ';';
 
-Note that as of version 0.05 the functionality from the former C<hold_row> option has been moved to the subclass module L<Tie::Array::CSV::HoldRow>. If deferring row operations is of interest to you, please see that module.
+Note that as of version 0.05 the functionality from the former C<hold_row> option has been separated into its own subclass module L<Tie::Array::CSV::HoldRow>. If deferring row operations is of interest to you, please see that module.
 
 =head1 ERRORS
 
