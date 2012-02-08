@@ -17,7 +17,7 @@ our @ISA = ('Tie::Array::CSV');
 
 sub TIEARRAY {
   my $class = shift;
-  my ($file, $opts) = parse_opts(@_);
+  my ($file, $opts) = $class->parse_opts(@_);
 
   my @tiefile;
   tie @tiefile, 'Tie::File', $file, %{ $opts->{tie_file} || {} }

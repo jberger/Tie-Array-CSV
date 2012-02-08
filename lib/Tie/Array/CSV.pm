@@ -61,9 +61,10 @@ sub parse_opts {
 
 sub new {
   my $class = shift;
-  my ($file, $opts) = parse_opts(@_);
+  my ($file, $opts) = $class->parse_opts(@_);
 
-  tie my @self, $class, $file, $opts;
+  my @self;
+  tie @self, $class, $file, $opts;
 
   return \@self;
 
@@ -71,7 +72,7 @@ sub new {
 
 sub TIEARRAY {
   my $class = shift;
-  my ($file, $opts) = parse_opts(@_);
+  my ($file, $opts) = $class->parse_opts(@_);
 
   my @tiefile;
   tie @tiefile, 'Tie::File', $file, %{ $opts->{tie_file} || {} }
@@ -135,6 +136,20 @@ sub STORESIZE {
   
 }
 
+sub DELETE {
+  my $self = shift;
+  my $index = shift;
+
+  $self->SPLICE($index,1);
+}
+
+sub EXISTS {
+  my $self = shift;
+  my $index = shift;
+
+  return $index < $self->FETCHSIZE;
+}
+
 package Tie::Array::CSV::Row;
 
 use Carp;
@@ -143,7 +158,7 @@ use Tie::Array;
 our @ISA = ('Tie::Array');
 
 use overload 
-  '@{}' => sub{ return @{ $_[0]{fields} } };
+  '@{}' => sub{ $_[0]{fields} };
 
 sub TIEARRAY {
   my $class = shift;
@@ -209,6 +224,23 @@ sub UNSHIFT {
   $self->_update;
 
   return $self->FETCHSIZE();
+}
+
+sub DELETE {
+  my $self = shift;
+  my $index = shift;
+
+  my $return = splice @{ $self->{fields} }, $index, 1;
+  $self->_update;
+
+  return $return;
+}
+
+sub EXISTS {
+  my $self = shift;
+  my $index = shift;
+
+  return $index < $self->FETCHSIZE;
 }
 
 sub _update {
