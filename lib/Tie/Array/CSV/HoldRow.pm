@@ -125,19 +125,6 @@ sub POP {
 
 sub CLEAR { shift->STORESIZE(0) }
 
-sub EXISTS { 
-  my $self = shift;
-  my ($index) = shift;
-  return exists $self->{file}[$index];
-}
-
-sub DELETE { 
-  my $self = shift;
-  my $index = shift;
-  my ($return) = $self->SPLICE($index,1);
-  return $return;
-}
-
 sub EXTEND  { }
 
 package Tie::Array::CSV::HoldRow::Row;

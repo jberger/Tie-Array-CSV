@@ -129,18 +129,16 @@ sub STORESIZE {
   
 }
 
-sub DELETE {
+sub EXISTS { 
   my $self = shift;
-  my $index = shift;
-
-  $self->SPLICE($index,1);
+  my ($index) = shift;
+  return exists $self->{file}[$index];
 }
 
-sub EXISTS {
+sub DELETE { 
   my $self = shift;
   my $index = shift;
-
-  return $index < $self->FETCHSIZE;
+  return $self->SPLICE($index,1);
 }
 
 sub _parse {
