@@ -267,13 +267,13 @@ __POD__
 
 =head1 NAME
 
-Tie::Array::CSV::HoldRow - A tied array which combines the power of Tie::File and Text::CSV
+Tie::Array::CSV - A tied array which combines the power of Tie::File and Text::CSV
 
 =head1 SYNOPSIS
 
  use strict; use warnings;
- use Tie::Array::CSV::HoldRow;
- tie my @file, 'Tie::Array::CSV::HoldRow', 'filename';
+ use Tie::Array::CSV;
+ tie my @file, 'Tie::Array::CSV', 'filename';
 
  print $file[0][2];
  $file[3][5] = "Camel";
@@ -335,14 +335,14 @@ N.B. Should a lone argument filename and a C<file> option key both be passed to 
 
 As with any tied array, the construction uses the C<tie> function. Basic usage is as follows:
 
- tie my @file, 'Tie::Array::CSV::HoldRow', 'filename';
+ tie my @file, 'Tie::Array::CSV', 'filename';
 
 which would tie the lexically scoped array C<@file> to the file C<filename> using this module. Following the first two arguements to C<tie>, one may optionally pass a key-value pairs or a hashref containing additional configuration or even file specification.
 
- tie my @file, 'Tie::Array::CSV::HoldRow', 'filename', { opt_key => val, ... };
- tie my @file, 'Tie::Array::CSV::HoldRow', 'filename', opt_key => val, ... ;
- tie my @file, 'Tie::Array::CSV::HoldRow', { file => 'filename', opt_key => val, ... };
- tie my @file, 'Tie::Array::CSV::HoldRow', file => 'filename', opt_key => val, ... ;
+ tie my @file, 'Tie::Array::CSV', 'filename', { opt_key => val, ... };
+ tie my @file, 'Tie::Array::CSV', 'filename', opt_key => val, ... ;
+ tie my @file, 'Tie::Array::CSV', { file => 'filename', opt_key => val, ... };
+ tie my @file, 'Tie::Array::CSV', file => 'filename', opt_key => val, ... ;
 
 Of course, the magical Perl C<tie> can be scary for some, for those people there is the ...
 
@@ -350,11 +350,11 @@ Of course, the magical Perl C<tie> can be scary for some, for those people there
 
 [ Added in version 0.03 ]
 
- my $array = Tie::Array::CSV::HoldRow->new( 'filename' );
- my $array = Tie::Array::CSV::HoldRow->new( 'filename', { opt_key => val, ... });
- my $array = Tie::Array::CSV::HoldRow->new( 'filename', opt_key => val, ... );
- my $array = Tie::Array::CSV::HoldRow->new( file => 'filename', opt_key => val, ... );
- my $array = Tie::Array::CSV::HoldRow->new( { file => 'filename', opt_key => val, ... } );
+ my $array = Tie::Array::CSV->new( 'filename' );
+ my $array = Tie::Array::CSV->new( 'filename', { opt_key => val, ... });
+ my $array = Tie::Array::CSV->new( 'filename', opt_key => val, ... );
+ my $array = Tie::Array::CSV->new( file => 'filename', opt_key => val, ... );
+ my $array = Tie::Array::CSV->new( { file => 'filename', opt_key => val, ... } );
 
 It only returns a reference to the C<tie>d array due to a limitations in how C<tie> magic works. 
 
@@ -382,14 +382,14 @@ C<sep_char> - for ease of use, a C<sep_char> option may be specified, which is p
 
 Equivalent examples:
 
- tie my @file, 'Tie::Array::CSV::HoldRow', 'filename', { 
+ tie my @file, 'Tie::Array::CSV', 'filename', { 
    tie_file => {}, 
    text_csv => { sep_char => ';' },
  };
 
- tie my @file, 'Tie::Array::CSV::HoldRow', 'filename', sep_char => ';';
+ tie my @file, 'Tie::Array::CSV', 'filename', sep_char => ';';
 
-Note that as of version 0.05 the functionality from the former C<hold_row> option has been moved to the subclass module L<Tie::Array::CSV::HoldRow>. If deferring row operations is of interest to you, investigate that module.
+Note that as of version 0.05 the functionality from the former C<hold_row> option has been moved to the subclass module L<Tie::Array::CSV::HoldRow>. If deferring row operations is of interest to you, please see that module.
 
 =head1 ERRORS
 
@@ -405,7 +405,7 @@ Much of the functionality of normal arrays is mimicked using L<Tie::Array>. The 
 
 =item *
 
-Some effort had been made to allow for fields which contain linebreaks. Linebreaks would change line numbers used for row access by L<Tie::File>. This, unfortunately, moved the module far from its stated goals, and therefore far less powerful for its intended purposes. The decision has been made (for now) not to support such files.
+At one time, some effort was been made to allow for fields which contain linebreaks. Quickly it became clear that linebreaks would change line numbers used for row access by L<Tie::File>. Attempts to compensate for this, unfortunately, moved the module far from its stated goals, and therefore far less powerful for its intended purposes. The decision has been made (for now) not to support such files.
 
 =back
 
