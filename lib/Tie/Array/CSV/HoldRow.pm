@@ -17,21 +17,12 @@ our @ISA = ('Tie::Array::CSV');
 
 sub TIEARRAY {
   my $class = shift;
-  my ($file, $opts) = $class->parse_opts(@_);
 
-  my @tiefile;
-  tie @tiefile, 'Tie::File', $file, %{ $opts->{tie_file} || {} }
-    or croak "Cannot tie file $file";
+  my $self = $class->SUPER::TIEARRAY(@_);
 
-  my $csv = Text::CSV->new($opts->{text_csv} || {}) 
-    or croak "CSV (new) error: " . Text::CSV->error_diag();
+  $self->{active_rows} = {},
 
-  my $self = {
-    file => \@tiefile,
-    csv => $csv,
-    active_rows => {},
-  };
-
+  # rebless
   bless $self, $class;
 
   return $self;
