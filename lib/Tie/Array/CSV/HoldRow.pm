@@ -10,7 +10,10 @@ use Text::CSV;
 
 use Scalar::Util qw/weaken/;
 
-use parent 'Tie::Array::CSV';
+use Tie::Array::CSV;
+our @ISA = ('Tie::Array::CSV');
+
+#TODO remove hold_row option, this will be on when using this class
 
 sub TIEARRAY {
   my $class = shift;
