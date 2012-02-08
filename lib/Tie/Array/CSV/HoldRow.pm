@@ -185,11 +185,9 @@ Tie::Array::CSV::HoldRow - A Tie::Array::CSV subclass for deferring row operatio
 
 =head1 DESCRIPTION
 
-This module allows an array to be tied to a CSV file for reading and writing. The array is a standard Perl 2D array (i.e. an array of array references) which gives access to the row and column of the user's choosing. This is done using the well established modules:
+This module is an experimental subclass of L<Tie::Array::CSV>, see usage information in that documentation. 
 
-Note that while the L<Tie::File> prevents the need to read in the entire file, while in use, a parsed row IS held in memory.
-
-C<hold_row> - If true, the file is not updated while the reference to the row is still in scope. The default is true. Note: that when false, the parsed row is still held in memory while the row is in scope, the ONLY difference is that the file reflects changes immediately when C<hold_row> is false. To reiterate, this option only affects file IO, not memory usage.
+While the usage is the same, the timing of the file IO is different. As opposed to the base module, the file is not updated while the reference to the row is still in scope. Note that for both modules, the parsed row is still held in memory while the row is in scope, the ONLY difference is that the file reflects changes immediately when C<hold_row> is false. To reiterate, this option only affects file IO, not memory usage.
 
 When multiple rows are kept alive/removed/modified there was the possibility that conflicting directives could be given to a single physical line. To combat this possibility, as of version 0.05, all (living) child row objects are made aware of line number changes in the parent (outer array) should these occur. Futher if a row object is alive, but the parent object removes that line, the row object is remains intact, but the links between the row object and parent/file are severed.
 
