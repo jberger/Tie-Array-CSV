@@ -159,9 +159,7 @@ sub _deferred_update {
     return undef;
   }
 
-  $self->{csv}->combine(@{ $self->{fields} })
-    or croak "CSV combine error: " . $self->{csv}->error_diag();
-  $self->{file}[$self->{line_num}] = $self->{csv}->string;
+  $self->SUPER::_update();
 }
 
 sub DESTROY {
