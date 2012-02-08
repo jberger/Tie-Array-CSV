@@ -13,8 +13,8 @@ use Scalar::Util qw/weaken/;
 use Tie::Array::CSV;
 our @ISA = ('Tie::Array::CSV');
 
-#TODO remove hold_row option, this will be on when using this class
-
+# This is essentially the same TIEARRAY method as T::A::CSV, 
+# but initializes active_rows. This isn't strictly necessary, thanks to autoviv
 sub TIEARRAY {
   my $class = shift;
 
@@ -131,16 +131,14 @@ package Tie::Array::CSV::HoldRow::Row;
 
 use Carp;
 
-use Tie::Array;
-our @ISA = ('Tie::Array');
-
-use overload 
-  '@{}' => sub{ $_[0]{fields} };
+use Tie::Array::CSV;
+our @ISA = ('Tie::Array::CSV::Row');
 
 sub TIEARRAY {
   my $class = shift;
-  my $self = shift;
+  my $self = $class->SUPER::TIEARRAY(@_);
 
+  # rebless
   bless $self, $class;
 
   $self->{need_update} = 0;
@@ -148,63 +146,13 @@ sub TIEARRAY {
   return $self;
 }
 
-sub FETCH {
-  my $self = shift;
-  my $index = shift;
-
-  return $self->{fields}[$index];
-}
-
-sub STORE {
-  my $self = shift;
-  my ($index, $value) = @_;
-
-  $self->{fields}[$index] = $value;
-
-  $self->{need_update} = 1;
-}
-
-sub FETCHSIZE {
-  my $self = shift;
-
-  return scalar @{ $self->{fields} };
-}
-
-sub STORESIZE {
-  my $self = shift;
-  my $new_size = shift;
-
-  my $return = (
-    $#{ $self->{fields} } = $new_size - 1
-  );
-
-  $self->{need_update} = 1;
-
-  return $return;
-}
-
-sub SHIFT {
-  my $self = shift;
-
-  my $value = shift @{ $self->{fields} };
-
-  $self->{need_update} = 1;
-
-  return $value;
-}
-
-sub UNSHIFT {
-  my $self = shift;
-  my $value = shift;
-
-  unshift @{ $self->{fields} }, $value;
-
-  $self->{need_update} = 1;
-
-  return $self->FETCHSIZE();
-}
-
+# _update now marks for deferred update
 sub _update {
+  my $self = shift;
+  $self->{need_update} = 1;
+}
+
+sub _deferred_update {
   my $self = shift;
   unless (defined $self->{line_num}) {
     carp "Attempted to write out from a severed row";
@@ -218,7 +166,7 @@ sub _update {
 
 sub DESTROY {
   my $self = shift;
-  $self->_update if $self->{need_update} == 1;
+  $self->_deferred_update if $self->{need_update} == 1;
 }
 
 __END__

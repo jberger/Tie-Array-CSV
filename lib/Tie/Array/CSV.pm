@@ -251,7 +251,7 @@ sub EXISTS {
   my $self = shift;
   my $index = shift;
 
-  return $index < $self->FETCHSIZE;
+  return exists $self->{fields}[$index];
 }
 
 sub _update {
