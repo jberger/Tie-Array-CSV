@@ -3,6 +3,9 @@ package Tie::Array::CSV;
 use strict;
 use warnings;
 
+our $VERSION = '0.06';
+$VERSION = eval $VERSION;
+
 use Carp;
 
 use Tie::File;
@@ -435,14 +438,6 @@ At one time, some effort was been made to allow for fields which contain linebre
 =item *
 
 L<Tie::CSV_File> - inspiration for this module, but problematic
-
-=item *
-
-L<Tie::Array::DBD> - tie database connection to array
-
-=item *
-
-L<Tie::DBI> - similar but hash based
 
 =back
 
