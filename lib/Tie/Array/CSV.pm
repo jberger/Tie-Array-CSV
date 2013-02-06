@@ -77,7 +77,7 @@ sub TIEARRAY {
   my ($file, $opts) = $class->parse_opts(@_);
 
   my @tiefile;
-  tie @tiefile, 'Tie::File', $file, %{ $opts->{tie_file} || {} }
+  tie @tiefile, 'Tie::File', $file, recsep => "\n", %{ $opts->{tie_file} || {} }
     or croak "Cannot tie file $file";
 
   my $csv;
@@ -454,9 +454,13 @@ L<http://github.com/jberger/Tie-Array-CSV>
 
 Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 
+=head1 CONTRIBUTORS
+
+Mithaldu - Christian Walde (cpan:MITHALDU) <walde.christian@googlemail.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by Joel Berger
+Copyright (C) 2013 by Joel Berger
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

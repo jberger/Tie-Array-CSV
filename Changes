@@ -1,5 +1,7 @@
 Revision history for Perl module Tie::Array::CSV.
 
+	- force Tie::File to use \n as line separator, fixing tests on Win32
+
 0.05  Feb 8, 2012
 	- 'hold_row' logic separated into T::A::CSV::HoldRow subclass
 	- T::A::CSV::HR::Row objects are more aware of their host's activities
