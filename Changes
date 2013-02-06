@@ -1,7 +1,7 @@
 Revision history for Perl module Tie::Array::CSV.
 
 0.06  Feb 6, 2013
-	- Force Tie::File to use \n as line separator, fixing tests on Win32
+	- Force Tie::File to use \n as line separator, fixing tests on Win32 (Mithaldu++)
 	- Use Module::Build directly
 
 0.05  Feb 8, 2012
