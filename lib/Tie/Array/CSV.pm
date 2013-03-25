@@ -3,7 +3,7 @@ package Tie::Array::CSV;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -154,21 +154,21 @@ sub DELETE {
 sub _parse {
   my $self = shift;
   my ($line) = @_;
+  $line = '' unless defined $line;
 
-  $self->{csv}->parse($line)
-    or croak "CSV parse error: " . $self->{csv}->error_diag();
+  return [$self->{csv}->fields] if $self->{csv}->parse($line);
 
-  return [$self->{csv}->fields];
+  croak "CSV parse error: " . $self->{csv}->error_diag;
 }
 
 sub _combine {
   my $self = shift;
   my ($value) = @_;
 
-  $self->{csv}->combine( ref $value ? @$value : ($value) )
-    or croak "CSV combine error: " . $self->{csv}->error_diag();
+  return $self->{csv}->string
+    if $self->{csv}->combine( ref $value ? @$value : ($value) );
 
-  return $self->{csv}->string;
+  croak "CSV combine error: " . $self->{csv}->error_diag();
 }
 
 package Tie::Array::CSV::Row;

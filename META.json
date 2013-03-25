@@ -36,7 +36,7 @@
    "provides" : {
       "Tie::Array::CSV" : {
          "file" : "lib/Tie/Array/CSV.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Tie::Array::CSV::HoldRow" : {
          "file" : "lib/Tie/Array/CSV/HoldRow.pm",
@@ -63,5 +63,5 @@
          "url" : "http://github.com/jberger/Tie-Array-CSV"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07"
 }

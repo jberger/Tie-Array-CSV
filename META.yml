@@ -18,7 +18,7 @@ no_index:
 provides:
   Tie::Array::CSV:
     file: lib/Tie/Array/CSV.pm
-    version: 0.06
+    version: 0.07
   Tie::Array::CSV::HoldRow:
     file: lib/Tie/Array/CSV/HoldRow.pm
     version: 0
@@ -37,4 +37,4 @@ resources:
   bugtracker: http://github.com/jberger/Tie-Array-CSV/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Tie-Array-CSV
-version: 0.06
+version: 0.07
