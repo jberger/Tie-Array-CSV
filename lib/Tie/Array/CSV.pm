@@ -267,9 +267,13 @@ sub EXISTS {
 sub _update {
   my $self = shift;
 
-  $self->{csv}->combine(@{ $self->{fields} })
-    or croak "CSV combine error: " . $self->{csv}->error_diag();
-  $self->{file}[$self->{line_num}] = $self->{csv}->string;
+  if(@{ $self->{fields} }) {
+    $self->{csv}->combine(@{ $self->{fields} })
+      or croak "CSV combine error: " . $self->{csv}->error_diag();
+    $self->{file}[$self->{line_num}] = $self->{csv}->string;
+  } else {
+    $self->{file}[$self->{line_num}] = '';
+  }
 }
 
 __END__
