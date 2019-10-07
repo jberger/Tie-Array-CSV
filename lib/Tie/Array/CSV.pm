@@ -3,7 +3,7 @@ package Tie::Array::CSV;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -455,11 +455,12 @@ Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 
 =head1 CONTRIBUTORS
 
-Mithaldu - Christian Walde (cpan:MITHALDU) <walde.christian@googlemail.com>
+Christian Walde (Mithaldu)
+Graham Ollis (plicease)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013 by Joel Berger
+Copyright (C) 2013 by L</AUTHOR> and L</CONTRIBUTORS>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
